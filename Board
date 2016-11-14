@@ -1,60 +1,26 @@
-/**
- * Created by leviallery on 11/9/16.
- */
-import java.util.Stack;
-public class Board{
-    int size = 0;
-    char[][] board;
-    in t moves = 0;
-    int location = 0;
-    int lastSpot = 0;
-    int xMove[] = { 2, 1, -1, -2, -2, -1, 1, 2 };
-    int yMove[] = { 1, 2, 2, 1, -1, -2, -2, -1 };
-    Stack moveLocation = new Stack();
-
-    Board(int s) {
-            size = s;
-            board = new char[size][size];
-        }
-
-    public void print() {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                System.out.print(board[i][j] + " ");
-            }
-            System.out.print("\n");
-        }
-        System.out.println();
-    }
-
-    public void move(int x, int y, int cycle){
-        moveLocation.push(board[x][y]);
-        for (int i = cycle; i < 8; i++) {
-            //Check to see if move is off board or already taken
-            if((x+xMove[i]) > 0 && (x+xMove[i]) < (size-1) && (y+yMove[i]) > 0 && (y+yMove[i])< (size-1) && board[x+xMove[i]][y+yMove[i]] != 'K'){
-                x += xMove[i];
-                y += yMove[i];
-                location = 0;
-                board[y][x] = 'K';
-                moves++; // Add # of moves
-                System.out.println("Number of moves: " + moves);
-                location += (y*size);
-                location += (x+1);
-                moveLocation.push(location);
-                print();
-                cycle = 0;
-            } else if(i == 7){
-                System.out.println("no more moves");
-                board[y][x] = '\u0000';
-                if(!moveLocation.isEmpty()) {
-                    lastSpot = (int) moveLocation.pop();
-                    move(lastSpot % 5 - 1, lastSpot / 5, ++cycle);
-            }else{
-                }
-        }
-        //If we can't find any moves pop off stack and restart
-
-
-        }
-    }
-}
+private static int[][] moves8 =
+ { {+1,-2}, {+2,-1}, {+2,+1}, {+1,+2},
+ {-1,+2}, {-2,+1}, {-2,-1}, {-1,-2} };
+ public int getNextPos() // picks next
+ { // possible
+ while(cycle < 8) // move
+ {
+ int dx = moves8[cycle][0]; // get move in
+ int dy = moves8[cycle][1]; // (x,y) format
+ int x = (position-1)%N; // translate from j
+ int y = (position-1)/N; // to (x,y) format
+ x = x + dx; // add move to
+ y = y + dy; // position
+ cycle++; // used this move
+ if(x>=0 && x<N && y>=0 && y<N) // on the board?
+ { // yes
+ int nextPos = x + y*N + 1; // (x,y) to j
+ if(Board.get(nextPos)==false) // unoccupied cell?
+ { // yes
+ return nextPos; // found a move
+ }
+ } // end if(x>=0...)
+ } // end while // no possible move
+ cycle = 0; // reset move index
+ return -1; // failure
+ } // end getNextPos()
