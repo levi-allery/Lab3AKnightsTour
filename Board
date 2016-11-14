@@ -1,26 +1,113 @@
-private static int[][] moves8 =
- { {+1,-2}, {+2,-1}, {+2,+1}, {+1,+2},
- {-1,+2}, {-2,+1}, {-2,-1}, {-1,-2} };
- public int getNextPos() // picks next
- { // possible
- while(cycle < 8) // move
- {
- int dx = moves8[cycle][0]; // get move in
- int dy = moves8[cycle][1]; // (x,y) format
- int x = (position-1)%N; // translate from j
- int y = (position-1)/N; // to (x,y) format
- x = x + dx; // add move to
- y = y + dy; // position
- cycle++; // used this move
- if(x>=0 && x<N && y>=0 && y<N) // on the board?
- { // yes
- int nextPos = x + y*N + 1; // (x,y) to j
- if(Board.get(nextPos)==false) // unoccupied cell?
- { // yes
- return nextPos; // found a move
- }
- } // end if(x>=0...)
- } // end while // no possible move
- cycle = 0; // reset move index
- return -1; // failure
- } // end getNextPos()
+/**
+ * Created by leviallery on 11/9/16.
+ */
+
+import java.util.Stack;
+
+public class Board {
+    //Variables
+    int size = 0;
+    char[][] board;
+    int moves = 0;
+    int location = 0;
+    int lastVisited = 0;
+    int xMove[] = {2, 1, -1, -2, -2, -1, 1, 2};
+    int yMove[] = {1, 2, 2, 1, -1, -2, -2, -1};
+    Stack moveLocation = new Stack();
+    Stack lastUsedI = new Stack();
+
+    Board(int s, int p) {
+        size = s;
+        location = p;
+        board = new char[size][size];
+        lastUsedI.push(0);
+    }
+
+    public void print() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.print("\n");
+        }
+        System.out.println();
+    }
+
+    public boolean isEmpty(int location) {
+        int x = (location - 1) % size;
+        int y = (location - 1) / size;
+        if (board[y][x] == 'K') {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public void move(int x, int y) {
+        moveLocation.push(location);
+        boolean done = false;
+        while (!done) {
+            if (moveLocation.isEmpty() || moveLocation.size() == (size*size)) { //Check to see if we are done
+                done = true;
+            }
+            for (int i = (int) lastUsedI.pop() ; i < 8; i++) {
+                //Check to see if move is off board
+                if ((x + xMove[i]) >= 0 && (x + xMove[i]) < size && (y + yMove[i]) >= 0 && (y + yMove[i]) < size) {
+                    location = ((y + yMove[i]) * size);
+                    location += ((x + xMove[i]) + 1); //Get this new location
+                    //See if this spot is already taken or was the last one visited
+                    if (isEmpty(location) && location != lastVisited) {
+                        lastVisited = location;
+                        x += xMove[i]; // X new position
+                        y += yMove[i];// Y new position
+                        location = (y * size);
+                        location += (x + 1); // move to new location
+                        moveLocation.push(location); // Push location on the stack
+                        board[y][x] = 'K'; // Show board with spot taken
+                        //print();
+                        moves++; // Add # of moves
+                        lastUsedI.push(i+1);
+                        i=-1;
+                    }
+                }
+            }
+            //System.out.println("No more moves, backing up one \n");
+            board[y][x] = '\u0000';
+            //print();
+            moveLocation.pop(); //Pop location off stack
+            if (!moveLocation.isEmpty()) {//Check to see if we are at the start position
+                location = (int) moveLocation.peek();
+                x = (location - 1) % size;
+                y = (location - 1) / size;
+            } else { //If we are back at the start we failed
+                System.out.println("Failure");
+                System.out.println("Number of moves: " + moves);
+                done = true;
+            }
+            //If we can't find any moves pop off stack and restart
+        }
+        //
+        //
+        //This last section prints moves in order from stack
+        //
+        //
+        int i = 0;
+        int[] array = new int[size * size];
+        while (!moveLocation.isEmpty()) { // get list in order from beginning
+            array[i] = (int) moveLocation.peek();
+            moveLocation.pop();
+            i++;
+        }
+        System.out.println();
+        while (i >= 0) {
+            if (array[i] != 0) {
+                System.out.print(array[i] + " ");
+                i--;
+            }else{
+                i--;
+            }
+        }
+        System.out.println();
+        System.out.println("Number of moves: " + moves);
+    }
+}
