@@ -17,13 +17,13 @@ public class Driver {
 
 
     public void Tour(int start, Board board) {
-        int x = start%5 -1;
-        int y = start/5;
+        int x = (start-1)% board.size;
+        int y = (start-1)/board.size;
         System.out.println("starting postions x :" + x);
         System.out.println("starting postions y :" + y);
         board.board[y][x] = 'K';
         board.print();
-        board.move(x,y,0);
+        board.move(x,y);
     }
 
     public void menu() {
@@ -33,7 +33,6 @@ public class Driver {
         int startPosition = 0;
         System.out.println ("Enter board size: ");
         boardSize = scn.nextInt();
-        Board b = new Board(boardSize);
         System.out.println("Enter the beginning square (1 to 25): ");
         boolean done = false;
         if(done){//To make sure a number between 1 and 25 was entered
@@ -44,6 +43,7 @@ public class Driver {
             }
         }
         startPosition = scn.nextInt();
+        Board b = new Board(boardSize, startPosition);
         Tour(startPosition, b);
     }
 
