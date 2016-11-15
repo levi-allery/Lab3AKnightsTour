@@ -1,5 +1,8 @@
 /**
- * Created by leviallery on 11/9/16.
+ * Levi Allery
+ * CSCI 232
+ * Lab 3 A Knights Tour
+ * 11/14/2016
  */
 
 import java.util.Scanner;
@@ -17,13 +20,10 @@ public class Driver {
 
 
     public void Tour(int start, Board board) {
-        int x = start%5 -1;
-        int y = start/5;
-        System.out.println("starting postions x :" + x);
-        System.out.println("starting postions y :" + y);
+        int x = (start-1)% board.size;
+        int y = (start-1)/board.size;
         board.board[y][x] = 'K';
-        board.print();
-        board.move(x,y,0);
+        board.move(x,y);
     }
 
     public void menu() {
@@ -31,19 +31,11 @@ public class Driver {
         Scanner scn = new Scanner(System.in);
         int boardSize = 0;
         int startPosition = 0;
-        System.out.println ("Enter board size: ");
+        System.out.println ("Enter board size(8 for 8x8 board) : ");
         boardSize = scn.nextInt();
-        Board b = new Board(boardSize);
         System.out.println("Enter the beginning square (1 to 25): ");
-        boolean done = false;
-        if(done){//To make sure a number between 1 and 25 was entered
-            if(scn.nextInt() < 1 || scn.nextInt() > 25){
-                System.out.println("Please enter a number between 1 & 25 :");
-            }else{
-                done = true;
-            }
-        }
         startPosition = scn.nextInt();
+        Board b = new Board(boardSize, startPosition);
         Tour(startPosition, b);
     }
 
