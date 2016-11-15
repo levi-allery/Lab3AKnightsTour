@@ -1,0 +1,143 @@
+/**
+ * Levi Allery
+ * CSCI 232
+ * Lab 3 A Knights Tour
+ * 11/14/2016
+ */
+
+import java.util.Scanner;
+import java.util.Stack;
+
+public class Driver {
+
+    public Driver() {
+        menu();
+    }
+
+    public static void main(String args[]) {
+        Driver d = new Driver();
+
+    }
+
+    public void Tour(int start, Board board) {//Begins the knights tour
+        int x = (start-1)% board.size; //Get first x
+        int y = (start-1)/board.size; // Get first y
+        board.board[y][x] = 'K';// Sets beginning square
+        board.move(x,y);// Begin moving
+    }
+
+    public void menu() {
+        //Variables
+        Scanner scn = new Scanner(System.in);
+        int boardSize = 0;
+        int startPosition = 0;
+        System.out.println ("Enter board size (8 for 8x8 board) : ");
+        boardSize = scn.nextInt();
+        System.out.println("Enter the beginning square (1 to 25): ");
+        startPosition = scn.nextInt();
+        Board b = new Board(boardSize, startPosition);//Create board
+        Tour(startPosition, b);//Begin tour
+    }
+
+}
+class Board {
+
+    //Variables
+    int size = 0;
+    char[][] board;
+    int moves = 0;
+    int location = 0;
+    int lastVisited = 0;
+    int xMove[] = {2, 1, -1, -2, -2, -1, 1, 2};  // 8 X direction moves
+    int yMove[] = {1, 2, 2, 1, -1, -2, -2, -1}; // 8 Y direction moves
+    Stack moveLocation = new Stack(); //Keep track of knight movement
+    Stack lastUsedI = new Stack(); //Keeps track of last used move
+
+    Board(int s, int p) {
+        size = s; //Set how big board is
+        location = p; //Pick starting location
+        board = new char[size][size];
+        lastUsedI.push(0); //First move will be a 0th move
+    }
+
+    public void print() { //Used for printing board if needed
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.print("\n");
+        }
+        System.out.println();
+    }
+
+    public boolean isEmpty(int location) { //Checks to see if the spot is taken
+        int x = (location - 1) % size;
+        int y = (location - 1) / size;
+        if (board[y][x] == 'K') {
+            return false; //Spot is taken
+        } else {
+            return true;//Spot is empty
+        }
+    }
+
+    void printAnswer() { //Prints off the move sequence
+        System.out.print("\nTotal number of moves: " + moves);
+        System.out.print("\nMoving Sequence: ");
+        int i = 0;
+        int[] array = new int[size * size]; //Make an array to hold data from stack
+        while (!moveLocation.isEmpty()) { // Go until stack is empty
+            array[i] = (int) moveLocation.pop(); // Get next item in stack and pop it off
+            i++;
+        }
+        i--;
+        while (i >= 0) {
+            System.out.print(array[i] + " "); // Don't print if equal to zero
+            i--;
+        }
+        System.out.println();
+
+    }
+
+    public void move(int x, int y) {
+        moveLocation.push(location);
+        boolean done = false;
+        while (!done) {
+            for (int i = (int) lastUsedI.pop(); i < 8; i++) {
+                //Check to see if move is off board
+                if ((x + xMove[i]) >= 0 && (x + xMove[i]) < size && (y + yMove[i]) >= 0 && (y + yMove[i]) < size) {
+                    location = ((y + yMove[i]) * size);
+                    location += ((x + xMove[i]) + 1); //Get this new location
+                    //See if this spot is already taken or was the last one visited
+                    if (isEmpty(location) && location != lastVisited) { //This prevents us from checking the same one twice and going in a loop
+                        lastVisited = location;//Keeping a record of where we just were
+                        x += xMove[i]; // X new position
+                        y += yMove[i];// Y new position
+                        location = (y * size);
+                        location += (x + 1); // move to new location
+                        moveLocation.push(location); // Push location on the stack
+                        board[y][x] = 'K'; // Show board with spot taken
+                        moves++; // Add # of moves
+                        lastUsedI.push(i + 1);//This allows the next move to be put on the stack
+                        i = -1;
+                    }
+                }
+            }
+            if (moveLocation.size() == ((size * size))) { //Check to see if we are done
+                System.out.print("Success!");
+                done = true;
+            } else {//We are not done and have to back track
+                board[y][x] = '\u0000';
+                moveLocation.pop(); //Pop location off stack
+                if (!moveLocation.isEmpty()) {//Check to see if we are at the start position
+                    location = (int) moveLocation.peek();//Get the last location from the stack
+                    x = (location - 1) % size; //New locations
+                    y = (location - 1) / size;// New locations
+                } else { //If we are back at the start we failed
+                    System.out.print("Failure");
+                    done = true;
+                }
+            }
+        }//End of while loop
+        printAnswer();
+    }
+}
